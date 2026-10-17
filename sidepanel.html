@@ -1,0 +1,754 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>待办助手</title>
+    <link rel="stylesheet" href="sidepanel.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="app-header">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path
+                d="m5.5 12.1 4.2 4.1 8.8-8.8"
+                stroke="currentColor"
+                stroke-width="2.7"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </span>
+          <div class="brand-copy">
+            <h1>待办助手</h1>
+            <p id="summary" class="summary">正在加载…</p>
+          </div>
+        </div>
+      </header>
+
+      <section class="control-bar" aria-label="筛选和新建待办">
+        <div class="filter-tabs" role="tablist" aria-label="筛选待办">
+          <button
+            type="button"
+            class="filter-tab is-active"
+            data-filter="open"
+            role="tab"
+            aria-selected="true"
+          >
+            待办
+          </button>
+          <button
+            type="button"
+            class="filter-tab"
+            data-filter="done"
+            role="tab"
+            aria-selected="false"
+          >
+            已完成
+          </button>
+          <button
+            type="button"
+            class="filter-tab"
+            data-filter="all"
+            role="tab"
+            aria-selected="false"
+          >
+            全部
+          </button>
+        </div>
+
+        <div class="create-actions">
+          <button
+            type="button"
+            id="newGroupButton"
+            class="button button-soft button-compact"
+            title="新建一组待办"
+            aria-label="新建分组"
+          >
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path
+                d="M3 5.5h8M3 10h6M3 14.5h4.5M14.75 10.25v5M12.25 12.75h5"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+              />
+            </svg>
+            <span>分组</span>
+          </button>
+          <button
+            type="button"
+            id="newTodoButton"
+            class="button button-primary button-compact"
+            title="新建待办"
+            aria-label="新建待办"
+          >
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path
+                d="M10 4.25v11.5M4.25 10h11.5"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+              />
+            </svg>
+            <span>新建</span>
+          </button>
+        </div>
+      </section>
+
+      <main id="taskArea" class="task-area" aria-live="polite"></main>
+    </div>
+
+    <dialog id="todoDialog" class="modal" aria-labelledby="todoDialogTitle">
+      <form id="todoForm" class="modal-card" novalidate>
+        <header class="modal-header">
+          <div>
+            <p class="eyebrow">任务详情</p>
+            <h2 id="todoDialogTitle">新建待办</h2>
+          </div>
+          <button
+            type="button"
+            class="icon-button"
+            data-close
+            aria-label="关闭"
+          >
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path
+                d="m5.5 5.5 9 9m0-9-9 9"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+              />
+            </svg>
+          </button>
+        </header>
+
+        <div class="modal-body">
+          <input type="hidden" id="todoId" />
+
+          <label class="field">
+            <span class="field-label">
+              名称
+              <span class="required" aria-hidden="true">*</span>
+            </span>
+            <input
+              id="todoName"
+              type="text"
+              maxlength="120"
+              autocomplete="off"
+              placeholder="例如：整理本周周报"
+              aria-required="true"
+            />
+          </label>
+
+          <label class="field">
+            <span class="field-label">备注</span>
+            <textarea
+              id="todoNote"
+              rows="3"
+              maxlength="1000"
+              placeholder="补充说明（可选）"
+            ></textarea>
+          </label>
+
+          <label class="field">
+            <span class="field-label">所属分组</span>
+            <select id="todoGroup"></select>
+          </label>
+
+          <div class="field-grid">
+            <div class="field">
+              <span class="field-label">截止时间</span>
+              <button
+                type="button"
+                id="todoDue"
+                class="datetime-button"
+                data-datetime-field
+                data-picker-label="选择截止时间"
+                data-field-name="截止时间"
+                aria-haspopup="dialog"
+                aria-label="选择截止时间"
+              >
+                <span class="datetime-value is-empty">未设置</span>
+                <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <rect
+                    x="2.3"
+                    y="3.5"
+                    width="11.4"
+                    height="10.2"
+                    rx="2"
+                    stroke="currentColor"
+                    stroke-width="1.2"
+                  />
+                  <path
+                    d="M5.2 2.2v2.6M10.8 2.2v2.6M2.5 6.4h11"
+                    stroke="currentColor"
+                    stroke-width="1.2"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div class="field">
+              <span class="field-label">提醒时间</span>
+              <button
+                type="button"
+                id="todoReminder"
+                class="datetime-button"
+                data-datetime-field
+                data-picker-label="选择提醒时间"
+                data-field-name="提醒时间"
+                aria-haspopup="dialog"
+                aria-label="选择提醒时间"
+              >
+                <span class="datetime-value is-empty">未设置</span>
+                <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <rect
+                    x="2.3"
+                    y="3.5"
+                    width="11.4"
+                    height="10.2"
+                    rx="2"
+                    stroke="currentColor"
+                    stroke-width="1.2"
+                  />
+                  <path
+                    d="M5.2 2.2v2.6M10.8 2.2v2.6M2.5 6.4h11"
+                    stroke="currentColor"
+                    stroke-width="1.2"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <fieldset class="priority-fieldset">
+            <legend class="field-label">优先级</legend>
+            <div class="priority-options">
+              <label class="priority-option" title="高优先级">
+                <input type="radio" name="todoPriority" value="high" />
+                <span class="priority-chip high">高</span>
+              </label>
+              <label class="priority-option" title="中优先级">
+                <input type="radio" name="todoPriority" value="medium" />
+                <span class="priority-chip medium">中</span>
+              </label>
+              <label class="priority-option" title="低优先级">
+                <input type="radio" name="todoPriority" value="low" />
+                <span class="priority-chip low">低</span>
+              </label>
+              <label class="priority-option" title="普通">
+                <input type="radio" name="todoPriority" value="none" />
+                <span class="priority-chip none">普通</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <p class="form-hint">
+            到达提醒时间后，浏览器会弹出系统通知。截止时间只用于展示和排序。
+          </p>
+          <p id="todoError" class="form-error" role="alert" hidden></p>
+        </div>
+
+        <footer class="modal-footer">
+          <button
+            type="button"
+            id="deleteTodoButton"
+            class="button button-danger-text"
+            hidden
+          >
+            删除
+          </button>
+          <span class="footer-spacer"></span>
+          <button type="button" class="button button-ghost" data-close>
+            取消
+          </button>
+          <button type="submit" class="button button-primary">保存</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <dialog id="groupDialog" class="modal" aria-labelledby="groupDialogTitle">
+      <form id="groupForm" class="modal-card" novalidate>
+        <header class="modal-header">
+          <div>
+            <p class="eyebrow">批量整理</p>
+            <h2 id="groupDialogTitle">新建分组</h2>
+          </div>
+          <button
+            type="button"
+            class="icon-button"
+            data-close
+            aria-label="关闭"
+          >
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path
+                d="m5.5 5.5 9 9m0-9-9 9"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+              />
+            </svg>
+          </button>
+        </header>
+
+        <div class="modal-body">
+          <label class="field">
+            <span class="field-label">
+              分组名称
+              <span class="required" aria-hidden="true">*</span>
+            </span>
+            <input
+              id="groupName"
+              type="text"
+              maxlength="80"
+              autocomplete="off"
+              placeholder="例如：产品上线准备"
+              aria-required="true"
+            />
+          </label>
+
+          <div class="section-heading">
+            <span>分组内的待办</span>
+            <span id="groupTaskCount" class="section-count"></span>
+          </div>
+
+          <div id="groupRows" class="group-rows"></div>
+
+          <button
+            type="button"
+            id="addGroupTaskButton"
+            class="button button-soft add-row-button"
+          >
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path
+                d="M10 4.25v11.5M4.25 10h11.5"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+              />
+            </svg>
+            再加一条待办
+          </button>
+
+          <p class="form-hint">
+            每条待办都可以单独设置截止时间、提醒时间和优先级。
+          </p>
+          <p id="groupError" class="form-error" role="alert" hidden></p>
+        </div>
+
+        <footer class="modal-footer">
+          <span class="footer-spacer"></span>
+          <button type="button" class="button button-ghost" data-close>
+            取消
+          </button>
+          <button type="submit" class="button button-primary">
+            保存分组
+          </button>
+        </footer>
+      </form>
+    </dialog>
+
+    <dialog
+      id="groupEditDialog"
+      class="modal"
+      aria-labelledby="groupEditDialogTitle"
+    >
+      <form id="groupEditForm" class="modal-card" novalidate>
+        <header class="modal-header">
+          <div>
+            <p class="eyebrow">分组设置</p>
+            <h2 id="groupEditDialogTitle">编辑分组</h2>
+          </div>
+          <button
+            type="button"
+            class="icon-button"
+            data-close
+            aria-label="关闭"
+          >
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path
+                d="m5.5 5.5 9 9m0-9-9 9"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+              />
+            </svg>
+          </button>
+        </header>
+
+        <div class="modal-body">
+          <input type="hidden" id="editGroupId" />
+          <label class="field">
+            <span class="field-label">
+              分组名称
+              <span class="required" aria-hidden="true">*</span>
+            </span>
+            <input
+              id="editGroupName"
+              type="text"
+              maxlength="80"
+              autocomplete="off"
+              aria-required="true"
+            />
+          </label>
+          <p id="groupEditError" class="form-error" role="alert" hidden></p>
+        </div>
+
+        <footer class="modal-footer">
+          <button
+            type="button"
+            id="deleteGroupButton"
+            class="button button-danger-text"
+          >
+            删除分组
+          </button>
+          <span class="footer-spacer"></span>
+          <button type="button" class="button button-ghost" data-close>
+            取消
+          </button>
+          <button type="submit" class="button button-primary">保存</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <dialog
+      id="datePickerDialog"
+      class="modal date-picker-dialog"
+      aria-labelledby="datePickerTitle"
+    >
+      <div class="modal-card date-picker-card">
+        <header class="modal-header">
+          <div>
+            <p class="eyebrow">时间设置</p>
+            <h2 id="datePickerTitle">选择截止时间</h2>
+          </div>
+          <button
+            type="button"
+            class="icon-button"
+            data-close
+            aria-label="关闭"
+          >
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path
+                d="m5.5 5.5 9 9m0-9-9 9"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+              />
+            </svg>
+          </button>
+        </header>
+
+        <div class="modal-body date-picker-body">
+          <div class="calendar">
+            <div class="calendar-toolbar">
+              <button
+                type="button"
+                id="calendarPrev"
+                class="icon-button calendar-nav"
+                aria-label="上个月"
+              >
+                <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                  <path
+                    d="m12 5-5 5 5 5"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </button>
+
+              <div class="calendar-heading">
+                <span
+                  id="calendarMonthLabel"
+                  class="calendar-month-label"
+                  aria-live="polite"
+                  >2026年10月</span
+                >
+                <button
+                  type="button"
+                  id="calendarToday"
+                  class="calendar-today-button"
+                >
+                  今天
+                </button>
+              </div>
+
+              <button
+                type="button"
+                id="calendarNext"
+                class="icon-button calendar-nav"
+                aria-label="下个月"
+              >
+                <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                  <path
+                    d="m8 5 5 5-5 5"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <div class="calendar-weekdays" aria-hidden="true">
+              <span>一</span>
+              <span>二</span>
+              <span>三</span>
+              <span>四</span>
+              <span>五</span>
+              <span>六</span>
+              <span>日</span>
+            </div>
+
+            <div
+              id="calendarGrid"
+              class="calendar-grid"
+              role="group"
+              aria-label="选择日期"
+            ></div>
+          </div>
+
+          <div class="datetime-time-field">
+            <span class="field-label">时间</span>
+            <div class="time-inputs">
+              <label class="time-input">
+                <input
+                  id="datetimeHour"
+                  type="number"
+                  min="0"
+                  max="23"
+                  inputmode="numeric"
+                  aria-label="小时"
+                />
+                <span>时</span>
+              </label>
+              <span class="time-separator" aria-hidden="true">:</span>
+              <label class="time-input">
+                <input
+                  id="datetimeMinute"
+                  type="number"
+                  min="0"
+                  max="59"
+                  inputmode="numeric"
+                  aria-label="分钟"
+                />
+                <span>分</span>
+              </label>
+            </div>
+          </div>
+
+          <p
+            id="datetimeSelectionLabel"
+            class="datetime-selection-label"
+            aria-live="polite"
+          ></p>
+          <p id="datetimeError" class="form-error" role="alert" hidden></p>
+        </div>
+
+        <footer class="modal-footer">
+          <button
+            type="button"
+            id="clearDateTimeButton"
+            class="button button-danger-text"
+          >
+            清除
+          </button>
+          <span class="footer-spacer"></span>
+          <button type="button" class="button button-ghost" data-close>
+            取消
+          </button>
+          <button
+            type="button"
+            id="confirmDateTimeButton"
+            class="button button-primary"
+          >
+            确定
+          </button>
+        </footer>
+      </div>
+    </dialog>
+
+    <dialog
+      id="confirmDialog"
+      class="modal"
+      aria-labelledby="confirmTitle"
+    >
+      <form method="dialog" class="modal-card confirm-card">
+        <div class="modal-body">
+          <span class="confirm-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path
+                d="M12 8v5m0 3.2v.1M10.3 3.8 2.6 17.2A2 2 0 0 0 4.3 20h15.4a2 2 0 0 0 1.7-2.8L13.7 3.8a2 2 0 0 0-3.4 0Z"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </span>
+          <h2 id="confirmTitle">确认删除</h2>
+          <p id="confirmMessage" class="confirm-message"></p>
+        </div>
+        <footer class="modal-footer">
+          <span class="footer-spacer"></span>
+          <button value="cancel" class="button button-ghost">取消</button>
+          <button
+            value="confirm"
+            id="confirmAccept"
+            class="button button-danger"
+          >
+            删除
+          </button>
+        </footer>
+      </form>
+    </dialog>
+
+    <template id="groupTaskTemplate">
+      <fieldset class="group-task-row">
+        <legend>
+          <span class="row-number">待办 1</span>
+        </legend>
+        <button
+          type="button"
+          class="icon-button row-remove"
+          data-action="remove-group-row"
+          aria-label="移除这条待办"
+        >
+          <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path
+              d="M4.5 6h11m-8.5 0V4.4h6V6m-7 0 .6 9.1h6.8l.6-9.1M8.4 8.7v4M11.6 8.7v4"
+              stroke="currentColor"
+              stroke-width="1.4"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
+
+        <label class="field">
+          <span class="field-label">
+            名称
+            <span class="required" aria-hidden="true">*</span>
+          </span>
+          <input
+            type="text"
+            data-field="name"
+            maxlength="120"
+            autocomplete="off"
+            placeholder="待办名称"
+            aria-required="true"
+          />
+        </label>
+
+        <label class="field">
+          <span class="field-label">备注</span>
+          <textarea
+            data-field="note"
+            rows="2"
+            maxlength="1000"
+            placeholder="补充说明（可选）"
+          ></textarea>
+        </label>
+
+        <div class="field-grid">
+          <div class="field">
+            <span class="field-label">截止时间</span>
+            <button
+              type="button"
+              class="datetime-button"
+              data-field="dueAt"
+              data-datetime-field
+              data-picker-label="选择截止时间"
+              data-field-name="截止时间"
+              aria-haspopup="dialog"
+              aria-label="选择截止时间"
+            >
+              <span class="datetime-value is-empty">未设置</span>
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <rect
+                  x="2.3"
+                  y="3.5"
+                  width="11.4"
+                  height="10.2"
+                  rx="2"
+                  stroke="currentColor"
+                  stroke-width="1.2"
+                />
+                <path
+                  d="M5.2 2.2v2.6M10.8 2.2v2.6M2.5 6.4h11"
+                  stroke="currentColor"
+                  stroke-width="1.2"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </button>
+          </div>
+          <div class="field">
+            <span class="field-label">提醒时间</span>
+            <button
+              type="button"
+              class="datetime-button"
+              data-field="reminderAt"
+              data-datetime-field
+              data-picker-label="选择提醒时间"
+              data-field-name="提醒时间"
+              aria-haspopup="dialog"
+              aria-label="选择提醒时间"
+            >
+              <span class="datetime-value is-empty">未设置</span>
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <rect
+                  x="2.3"
+                  y="3.5"
+                  width="11.4"
+                  height="10.2"
+                  rx="2"
+                  stroke="currentColor"
+                  stroke-width="1.2"
+                />
+                <path
+                  d="M5.2 2.2v2.6M10.8 2.2v2.6M2.5 6.4h11"
+                  stroke="currentColor"
+                  stroke-width="1.2"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="priority-field">
+          <span class="field-label">优先级</span>
+          <div class="priority-options priority-options-compact">
+            <label class="priority-option" title="高优先级">
+              <input type="radio" value="high" data-priority-radio />
+              <span class="priority-chip high">高</span>
+            </label>
+            <label class="priority-option" title="中优先级">
+              <input type="radio" value="medium" data-priority-radio />
+              <span class="priority-chip medium">中</span>
+            </label>
+            <label class="priority-option" title="低优先级">
+              <input type="radio" value="low" data-priority-radio />
+              <span class="priority-chip low">低</span>
+            </label>
+            <label class="priority-option" title="普通">
+              <input type="radio" value="none" data-priority-radio />
+              <span class="priority-chip none">普通</span>
+            </label>
+          </div>
+        </div>
+      </fieldset>
+    </template>
+
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+    <script src="sidepanel.js"></script>
+  </body>
+</html>
