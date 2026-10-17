@@ -14,10 +14,10 @@
   --border: rgba(32, 35, 48, 0.08);
   --border-strong: rgba(32, 35, 48, 0.14);
 
-  --accent: #6165ee;
-  --accent-strong: #4f46b8;
-  --accent-soft: rgba(97, 101, 238, 0.11);
-  --accent-glow: rgba(97, 101, 238, 0.24);
+  --accent: #35b2e5;
+  --accent-strong: #0a739f;
+  --accent-soft: rgba(53, 178, 229, 0.12);
+  --accent-glow: rgba(53, 178, 229, 0.25);
 
   --danger: #dc4c55;
   --danger-soft: rgba(220, 76, 85, 0.1);
@@ -59,10 +59,10 @@
     --border: rgba(255, 255, 255, 0.075);
     --border-strong: rgba(255, 255, 255, 0.14);
 
-    --accent: #8b8ff7;
-    --accent-strong: #b0b3fc;
-    --accent-soft: rgba(139, 143, 247, 0.15);
-    --accent-glow: rgba(99, 102, 241, 0.26);
+    --accent: #7dd3fc;
+    --accent-strong: #a7e8ff;
+    --accent-soft: rgba(125, 211, 252, 0.15);
+    --accent-glow: rgba(56, 189, 248, 0.27);
 
     --danger: #f27b83;
     --danger-soft: rgba(242, 123, 131, 0.13);
@@ -109,12 +109,12 @@ body {
   background:
     radial-gradient(
       circle at 8% -6%,
-      rgba(97, 101, 238, 0.13),
+      rgba(53, 178, 229, 0.14),
       transparent 34%
     ),
     radial-gradient(
       circle at 100% 4%,
-      rgba(124, 58, 237, 0.07),
+      rgba(34, 211, 238, 0.08),
       transparent 28%
     ),
     var(--bg);
@@ -168,13 +168,13 @@ svg {
   width: 41px;
   height: 41px;
   border-radius: 13px;
-  color: #ffffff;
+  color: #052b3d;
   background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.24), transparent 46%),
-    linear-gradient(135deg, #5f63ee 5%, #8055e9 58%, #9a4fe0 100%);
+    linear-gradient(145deg, rgba(255, 255, 255, 0.3), transparent 46%),
+    linear-gradient(135deg, #6fd8ff 5%, #31b4e8 58%, #0a8cc4 100%);
   box-shadow:
-    0 7px 18px rgba(97, 101, 238, 0.28),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    0 7px 18px rgba(53, 178, 229, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.34);
 }
 
 .brand-mark svg {
@@ -295,17 +295,17 @@ svg {
 }
 
 .button-primary {
-  color: #ffffff;
-  background: linear-gradient(135deg, #6366f1, #7c5ce8);
+  color: #052c40;
+  background: linear-gradient(135deg, #94e6ff, #4cc4f0);
   box-shadow:
-    0 5px 14px rgba(99, 102, 241, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    0 5px 14px rgba(53, 178, 229, 0.26),
+    inset 0 1px 0 rgba(255, 255, 255, 0.36);
 }
 
 .button-primary:hover {
   box-shadow:
-    0 7px 20px rgba(99, 102, 241, 0.34),
-    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    0 7px 20px rgba(53, 178, 229, 0.36),
+    inset 0 1px 0 rgba(255, 255, 255, 0.36);
   transform: translateY(-1px);
 }
 
@@ -473,8 +473,8 @@ svg {
   border-radius: var(--radius-lg);
   background: linear-gradient(
     160deg,
-    rgba(97, 101, 238, 0.055),
-    rgba(97, 101, 238, 0.018) 55%,
+    rgba(53, 178, 229, 0.06),
+    rgba(53, 178, 229, 0.02) 55%,
     transparent
   );
 }
@@ -512,8 +512,8 @@ svg {
   width: 4px;
   height: 17px;
   border-radius: 999px;
-  background: linear-gradient(180deg, #7779f5, #9d62ec);
-  box-shadow: 0 0 0 3px rgba(97, 101, 238, 0.08);
+  background: linear-gradient(180deg, #6ed9ff, #219fd7);
+  box-shadow: 0 0 0 3px rgba(53, 178, 229, 0.09);
 }
 
 .group-plain .group-marker {
@@ -676,8 +676,8 @@ svg {
 
 .is-completed .task-check {
   border-color: var(--accent);
-  color: #ffffff;
-  background: var(--accent);
+  color: #052c40;
+  background: linear-gradient(135deg, #94e6ff, #4cc4f0);
 }
 
 .task-content {
@@ -1331,14 +1331,14 @@ svg {
 }
 
 .calendar-day.is-selected {
-  color: #ffffff;
-  background: linear-gradient(135deg, #6366f1, #7c5ce8);
+  color: #052c40;
+  background: linear-gradient(135deg, #94e6ff, #4cc4f0);
   box-shadow: 0 4px 10px var(--accent-glow);
   font-weight: 700;
 }
 
 .calendar-day.is-selected:hover {
-  background: linear-gradient(135deg, #5f63ee, #7855e5);
+  background: linear-gradient(135deg, #83e0ff, #3cbbec);
 }
 
 .calendar-day:focus-visible {

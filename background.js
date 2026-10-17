@@ -202,7 +202,7 @@ async function updateBadge(state) {
 
   try {
     await chrome.action.setBadgeText({ text: badgeText });
-    await chrome.action.setBadgeBackgroundColor({ color: "#6366F1" });
+    await chrome.action.setBadgeBackgroundColor({ color: "#2BA8DF" });
     await chrome.action.setTitle({
       title: openCount
         ? `待办助手 · ${openCount} 条待办`
